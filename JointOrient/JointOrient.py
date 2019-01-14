@@ -1,13 +1,15 @@
 import maya.cmds as mc
 
-channels = ["X", "Y", "Z"]
+channels = ["X", "Y", "Z"]  # General channels used by several attributes
 all_channels = True
+# Individual channels won't be supported initially
 channel_x = True
 channel_y = False
 channel_z = False
 
-window = mc.window(title="Joint Orientation Tool", iconName='Short Name', widthHeight=(200, 105))
-mc.columnLayout(adjustableColumn=True)
+window = mc.window(title="Joint Orientation Tool", iconName='Short Name', widthHeight=(400, 105))
+column = mc.columnLayout(adjustableColumn=True)
+mc.layerButton(name='defaultLayer', color=(1.0, 0.0, 0.0), select=True)
 mc.button(label="Reorient Single Joint", c="reorient_selected()")
 mc.button(label="Reorient Joints", command="reorient_tree()")
 ignore_children = mc.checkBox("Ignore Children")
@@ -15,14 +17,17 @@ mc.button(label="Reset Joint Orientation", command="reset_orientation()")
 mc.button(label="Reset Joint Rotation", command="reset_rotation()")
 mc.showWindow()
 
+# test = mc.layout(column, query=True, numberOfChildren=True)  # Discover properties regarding window layout.
+
 
 def is_parent(sel):
+    proud_parent = False
     mc.select(sel, add=False)
     mc.pickWalk(direction='down')
     child = mc.ls(selection=True)
     if sel == child[0]:
-        return False
-    return True
+        proud_parent = True
+    return proud_parent
 
 
 def reorient(selection, channel, additive=True):
